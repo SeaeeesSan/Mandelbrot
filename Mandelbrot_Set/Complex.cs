@@ -3,8 +3,8 @@ namespace Mandelbrot_Set
 {
     public class Complex
     {
-        public double X { get; set; }
-        public double Y { get; set; }
+        private double X { get; set; }
+        private double Y { get; set; }
 
         public Complex(double x, double y)
         {
@@ -12,17 +12,9 @@ namespace Mandelbrot_Set
             Y = y;
         }
 
-        public Complex() { }
-
         public Complex Square()
         {
-            return new Complex(X*X - Y*Y, X*Y*2);
-        }
-
-        public Complex Cube()
-        {
-            //(x+yi)^3 = xxx + 3xxyi - 3xyy - yyyi
-            return new Complex(X*X*X-3*X*Y*Y, 3*X*X*Y-Y*Y*Y);
+            return new Complex(X * X - Y * Y, X * Y * 2);
         }
 
         public Complex Conjugate()
@@ -32,7 +24,7 @@ namespace Mandelbrot_Set
 
         public double Abs()
         {
-            return Math.Sqrt(X*X + Y*Y);
+            return Math.Sqrt(X * X + Y * Y);
         }
 
         public static Complex operator + (Complex z, Complex w)
