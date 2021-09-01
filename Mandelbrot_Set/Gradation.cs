@@ -1,7 +1,7 @@
 using System.Drawing;
 namespace Mandelbrot_Set
 {
-    public static class Utils
+    public static class Gradation
     {
         public static Color GetColor(int i, int limit)
         {

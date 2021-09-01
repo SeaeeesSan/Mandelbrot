@@ -1,5 +1,6 @@
 ﻿using System.Drawing;
 using System.Drawing.Imaging;
+using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
@@ -12,12 +13,12 @@ namespace Mandelbrot_Set
 
         static void Main(string[] args)
         {
-            var cam = new Camera(-0.5, 0, 2);
-            var result = CalcImage(Resolution, Limit, cam);
+            var pos = new Vector2(-0.5f, 0.0f);
+            var result = CalcImage(Resolution, Limit, pos, 2);
             result.Save($@"D:\mandel.png", ImageFormat.Png);
         }
 
-        private static Bitmap CalcImage(int resolution, int limit, Camera camera)
+        private static Bitmap CalcImage(int resolution, int limit, Vector2 position, double foV)
         {
             var bitmap = new Bitmap(resolution, resolution);
             var bmpData = bitmap.LockBits(
@@ -34,9 +35,10 @@ namespace Mandelbrot_Set
             {
                 Parallel.For(0, resolution, j =>
                 {
-                    var c = new Complex((double)i / Resolution * camera.FoV + camera.X - camera.FoV / 2, (double)j / Resolution * camera.FoV - camera.Y - camera.FoV / 2);
-                    var col = Utils.GetColor(CalcMandelbrot(c,limit), limit);
+                    var c = new Complex((double)i / Resolution * foV + position.X - foV / 2, (double)j / Resolution * foV - position.Y - foV / 2);
+                    var col = Gradation.GetColor(CalcMandelbrot(c,limit), limit);
                     var pos = j * bmpData.Stride + i * 4;
+
                     pixels[pos] = col.B;
                     pixels[pos + 1] = col.G;
                     pixels[pos + 2] = col.R;
@@ -51,12 +53,12 @@ namespace Mandelbrot_Set
 
         private static int CalcMandelbrot(Complex cComplex, int limit)
         {
-            Complex zComplex = new Complex(0, 0);
+            var zComplex = Complex.Zero;
             for (int i = 0; i < limit; i++)
             {
-                zComplex = zComplex.Square() + cComplex;
+                zComplex = Complex.Pow(zComplex, 2) + cComplex;
                 //発散
-                if (zComplex.Abs() > 2.0) return i;
+                if (zComplex.Magnitude > 2.0) return i;
             }
             //発散しない
             return -1;
@@ -66,9 +68,9 @@ namespace Mandelbrot_Set
         {
             for (int i = 0; i < limit; i++)
             {
-                zComplex = zComplex.Square() + cComplex;
+                zComplex = Complex.Pow(zComplex, 2) + cComplex;
                 //発散
-                if (zComplex.Abs() > 2.0) return i;
+                if (zComplex.Magnitude > 2.0) return i;
             }
             //発散しない
             return -1;
@@ -76,12 +78,12 @@ namespace Mandelbrot_Set
 
         private static int CalcTricorn(Complex cComplex, int limit)
         {
-            Complex zComplex = new Complex(0, 0);
+            var zComplex = Complex.Zero;
             for (int i = 0; i < limit; i++)
             {
-                zComplex = zComplex.Conjugate().Square() + cComplex;
+                zComplex = Complex.Pow(Complex.Conjugate(zComplex), 2) + cComplex;
                 //発散
-                if (zComplex.Abs() > 2.0) return i;
+                if (zComplex.Magnitude > 2.0) return i;
             }
             //発散しない
             return -1;
